@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- Support for using conhost.dll and OpenConsole.exe on Windows
+
 ### Changed
 
 - ConPTY: when pasting, replace "\r\n" with "\n"
