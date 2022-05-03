@@ -11,6 +11,8 @@
 
         <Feature Id="ProductFeature" Title="ConsoleApp" Level="1">
             <ComponentRef Id="AlacrittyExe"/>
+            <ComponentRef Id="OpenConsoleExe"/>
+            <ComponentRef Id="ConptyDll"/>
             <ComponentRef Id="AlacrittyShortcut"/>
             <ComponentRef Id="ModifyPathEnv"/>
             <ComponentRef Id="ContextMenu"/>
@@ -30,6 +32,12 @@
         <DirectoryRef Id="AlacrittyProgramFiles">
             <Component Id="AlacrittyExe" Guid="*">
                 <File Id="AlacrittyExeFile" Source=".\target\release\alacritty.exe" Name="alacritty.exe" KeyPath="yes"/>
+            </Component>
+            <Component Id="OpenConsoleExe" Guid="*">
+                <File Id="OpenConsoleExeFile" Source=".\OpenConsole.exe" Name="OpenConsole.exe" KeyPath="yes"/>
+            </Component>
+            <Component Id="ConptyDll" Guid="*">
+                <File Id="ConptyDllFile" Source=".\conpty.dll" Name="copnty.dll" KeyPath="yes"/>
             </Component>
         </DirectoryRef>
 
