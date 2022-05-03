@@ -2,7 +2,8 @@ name: Release
 
 on:
   push:
-    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+    tags:
+      - v*
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,10 +23,16 @@ jobs:
         run: cargo build --release --target=aarch64-apple-darwin
       - name: Make DMG
         run: make dmg-universal
-      - name: Upload Application
+      - name: Rename files
         run: |
           mv ./target/release/osx/Alacritty.dmg ./Alacritty-${GITHUB_REF##*/}.dmg
-          ./.github/workflows/upload_asset.sh ./Alacritty-${GITHUB_REF##*/}.dmg $GITHUB_TOKEN
+      - uses: svenstaro/upload-release-action@v2
+        name: Upload attachment to release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: Alacritty-${GITHUB_REF##*/}.dmg
+          tag: ${{ github.ref }}
+          overwrite: true
 
   windows:
     runs-on: windows-latest
@@ -47,6 +54,10 @@ jobs:
             ./Alacritty-${GITHUB_REF##*/}-portable.exe $GITHUB_TOKEN
       - name: Install WiX
         run: nuget install WiX
+      - name: Download and unpack OpenConsole bundle
+        run: |
+          wget https://github.com/DoomHammer/openconsole-bundle/releases/download/v0.1/openconsole-bundle.zip
+          unzip x openconsole-bundle.zip
       - name: Crate msi installer
         run: |
           ./WiX.*/tools/candle.exe -nologo -arch "x64" -ext WixUIExtension -ext WixUtilExtension \
@@ -58,6 +69,13 @@ jobs:
         run: |
           ./.github/workflows/upload_asset.sh \
             ./Alacritty-${GITHUB_REF##*/}-installer.msi $GITHUB_TOKEN
+      - uses: svenstaro/upload-release-action@v2
+        name: Upload attachment to release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: Alacritty-${GITHUB_REF##*/}-installer.msi
+          tag: ${{ github.ref }}
+          overwrite: true
 
   linux:
     runs-on: ubuntu-latest
@@ -74,15 +92,14 @@ jobs:
         run: |
           gzip -c "./extra/alacritty.man" > "./alacritty.1.gz"
           gzip -c "./extra/alacritty-msg.man" > "./alacritty-msg.1.gz"
-      - name: Upload Assets
+      - name: Rename files
         run: |
           mv ./extra/logo/alacritty-term.svg ./Alacritty.svg
-          ./.github/workflows/upload_asset.sh ./Alacritty.svg $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./alacritty.1.gz $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./alacritty-msg.1.gz $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./extra/completions/alacritty.bash $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./extra/completions/alacritty.fish $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./extra/completions/_alacritty $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./extra/linux/Alacritty.desktop $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./extra/alacritty.info $GITHUB_TOKEN
-          ./.github/workflows/upload_asset.sh ./alacritty.yml $GITHUB_TOKEN
+      - uses: svenstaro/upload-release-action@v2
+        name: Upload attachment to release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: '*lacritty.*'
+          file_glob: true
+          tag: ${{ github.ref }}
+          overwrite: true
